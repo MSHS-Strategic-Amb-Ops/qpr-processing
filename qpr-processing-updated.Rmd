@@ -236,20 +236,20 @@ scheduling_data_raw_tbl <- scheduling_data_raw_tbl %>%
 
 ```{r Data Manual Mapping of Specialty (Campus.Specialty.Group), echo = FALSE, warning = FALSE, message = FALSE}
 
-# Mix of NeuroSurg and Ortho provideres at 787 11TH AVE MSW SPINE CENTER
-ortho_providers_npi <- c("1538318209", #CHO, SAMUEL K-W
-                         "1770829541", #MAHAJER, AMIR
-                         "1962829309", #KIM, JUN SUP
-                         "1750417283") #BAX, JOSEPH A.
-
-ortho_providers <- c("CHO, SAMUEL K-W", 
-                     "MAHAJER, AMIR", 
-                     "KIM, JUN SUP", 
-                     "BAX, JOSEPH A") 
-
-
-scheduling_data_raw_tbl <- scheduling_data_raw_tbl %>%
-  mutate(Campus.Specialty.Group = ifelse(DEPARTMENT_NAME == "787 11TH AVE MSW SPINE CENTER" & NPI %in% ortho_providers_npi, "Orthopedics", Campus.Specialty.Group))
+# # Mix of NeuroSurg and Ortho provideres at 787 11TH AVE MSW SPINE CENTER
+# ortho_providers_npi <- c("1538318209", #CHO, SAMUEL K-W
+#                          "1770829541", #MAHAJER, AMIR
+#                          "1962829309", #KIM, JUN SUP
+#                          "1750417283") #BAX, JOSEPH A.
+# 
+# ortho_providers <- c("CHO, SAMUEL K-W", 
+#                      "MAHAJER, AMIR", 
+#                      "KIM, JUN SUP", 
+#                      "BAX, JOSEPH A") 
+# 
+# 
+# scheduling_data_raw_tbl <- scheduling_data_raw_tbl %>%
+#   mutate(Campus.Specialty.Group = ifelse(DEPARTMENT_NAME == "787 11TH AVE MSW SPINE CENTER" & NPI %in% ortho_providers_npi, "Orthopedics", Campus.Specialty.Group))
 
 ```
 
@@ -508,7 +508,7 @@ scheduling_data_raw_tbl <- scheduling_data_raw_tbl %>%
 ```
 
 
-```{r}
+```{r Manual Import Wait Time Data, echo = FALSE, warning = FALSE, message = FALSE}
 
 waitTime_dist_specialty_ytd <- readRDS("waitTime_dist_specialty_ytd.rds")
 waitTime_dist_site_ytd <- readRDS("waitTime_dist_site_ytd.rds")

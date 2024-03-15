@@ -106,7 +106,6 @@ suppressMessages({
 
 ```
 
-
 ```{r Connect Data, echo = FALSE, warning = FALSE, message = FALSE}
 
 # Connection to Oracle DB ------------------------------------------------------
@@ -120,14 +119,12 @@ access_raw_tbl <- tbl(conn1, "MV_DM_PATIENT_ACCESS")
 date_1 <- paste0(format(Sys.Date(), "%Y-%m-%d"), " 00:00:00")
 ```
 
-
 ```{r Global Functions, echo = FALSE, warning = FALSE, message = FALSE}
 
 '%!in%' <- function(x,y)!('%in%'(x,y)) # Does not include
 not_all_na <- function(x) all(!is.na(x)) # Exclude columns with All NAs
 
 ```
-
 
 ```{r Processing Variables, echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -149,7 +146,6 @@ reporting_month <- ifelse(length(ytd_month_list) == 12,
 
 ```
 
-
 ```{r Process Scheduling Data, echo = FALSE, warning = FALSE, message = FALSE}
 
 scheduling_data_raw_tbl <- access_raw_tbl %>%
@@ -167,7 +163,6 @@ scheduling_data_raw_tbl <- access_raw_tbl %>%
   mutate(Visit.Method  = ifelse(VISIT_METHOD == "IN PERSON", 'IN PERSON', 'TELEHEALTH')) 
 
 ```
-
 
 ```{r Map Campus.Specialty.Group, echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -193,7 +188,6 @@ scheduling_data_raw_tbl <- scheduling_data_raw_tbl %>%
 
 ```
 
-
 ```{r Map Sessional Provider Departments, echo = FALSE, warning = FALSE, message = FALSE}
 
 # Mapping of sessional providers  ----------------------------------------------
@@ -214,7 +208,6 @@ scheduling_data_raw_tbl <- scheduling_data_raw_tbl %>%
 
 ```
 
-
 ```{r Map Office vs. Procedure, echo = FALSE, warning = FALSE, message = FALSE}
 
 # Mapping of Office vs. Procedure Encounters by Appt Type ----------------------
@@ -232,7 +225,6 @@ scheduling_data_raw_tbl <- scheduling_data_raw_tbl %>%
   mutate(Office = ifelse(is.na(Classification), Office, Classification)) 
 
 ```
-
 
 ```{r Data Manual Mapping of Specialty (Campus.Specialty.Group), echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -253,7 +245,6 @@ scheduling_data_raw_tbl <- scheduling_data_raw_tbl %>%
 
 ```
 
-
 ```{r Process EPIC Open Encounters, echo = FALSE, warning = FALSE, message = FALSE}
 
 scheduling_data_raw_tbl <- scheduling_data_raw_tbl %>%
@@ -265,7 +256,6 @@ scheduling_data_raw_tbl <- scheduling_data_raw_tbl %>%
 
 
 ```
-
 
 ```{r Access Tables by Month, echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -387,7 +377,6 @@ scheduling_data_raw_tbl <- scheduling_data_raw_tbl %>%
 
 ```
 
-
 ```{r Access Tables by Month (Office), echo = FALSE, warning = FALSE, message = FALSE}
 
 # ## MSHS New Patient Wait Time Horizon ===============================================
@@ -507,7 +496,6 @@ scheduling_data_raw_tbl <- scheduling_data_raw_tbl %>%
 
 ```
 
-
 ```{r Manual Import Wait Time Data, echo = FALSE, warning = FALSE, message = FALSE}
 
 waitTime_dist_specialty_ytd <- readRDS("waitTime_dist_specialty_ytd.rds")
@@ -534,7 +522,6 @@ waitTime_site_group_office_ytd <- readRDS("waitTime_site_group_office_ytd.rds")
 waitTime_prov_group_office_ytd <- readRDS("waitTime_prov_group_office_ytd.rds")
 
 ```
-
 
 ```{r YTD Access Tables, echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -597,7 +584,9 @@ waitTime_dist_specialty_group_ytd <- waitTime_ytd %>%
 waitTime_dist_site_group_ytd <- waitTime_ytd %>%
   group_by(Campus.Specialty.Group, Site, Appt.Made.Year, New.PT2) %>%
   mutate(med_wait = median(Wait.Time, na.rm = TRUE)) %>%
-  group_by(Campus.Specialty.Group, Site, Appt.Made.Year, New.PT2, Visit.Method, med_wait, group) %>%
+  group_by(Campus.Specialty.Group, Appt.Made.Year, New.PT2, Visit.Method, group) %>%
+  mutate(med_wait_group = median(Wait.Time, na.rm = TRUE)) %>%
+  group_by(Campus.Specialty.Group, Site, Appt.Made.Year, New.PT2, Visit.Method, med_wait, med_wait_group, group) %>%
   summarise(total = n()) %>%
   collect()
 
@@ -622,7 +611,6 @@ waitTime_prov_group_ytd <- waitTime_ytd %>%
   collect()
 
 ```
-
 
 ```{r YTD Access Tables (Office), echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -686,7 +674,9 @@ waitTime_dist_specialty_group_office_ytd <- waitTime_ytd_office %>%
 waitTime_dist_site_group_office_ytd <- waitTime_ytd_office %>%
   group_by(Campus.Specialty.Group, Site, Appt.Made.Year, New.PT2) %>%
   mutate(med_wait = median(Wait.Time, na.rm = TRUE)) %>%
-  group_by(Campus.Specialty.Group, Site, Appt.Made.Year, New.PT2, Visit.Method, med_wait, group) %>%
+  group_by(Campus.Specialty.Group, Appt.Made.Year, New.PT2, Visit.Method, group) %>%
+  mutate(med_wait_group = median(Wait.Time, na.rm = TRUE)) %>%
+  group_by(Campus.Specialty.Group, Site, Appt.Made.Year, New.PT2, Visit.Method, med_wait, med_wait_group, group) %>%
   summarise(total = n()) %>%
   collect()
 
@@ -712,7 +702,6 @@ waitTime_prov_group_office_ytd <- waitTime_ytd_office %>%
 
 ```
 
-
 ```{r Process Wait Time Table, echo = FALSE, warning = FALSE, message = FALSE}
 
 waitTime_site_group_ytd_merged <- bind_rows(waitTime_dist_site_group_ytd %>% mutate(type = "All"),
@@ -726,7 +715,6 @@ waitTime_specialty_ytd_merged <- bind_rows(waitTime_dist_specialty_ytd %>% mutat
                                                 waitTime_dist_specialty_office_ytd %>% mutate(type = "Office"))
 
 ```
-
 
 ```{r Execute Wait Time Table, echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -789,7 +777,6 @@ for (i in index_squence) {
 
 ```
 
-
 ```{r Volume Tables (All), echo = FALSE, warning = FALSE, message = FALSE}
 
 # Volume Tables ----------------------------------------------------------------
@@ -819,7 +806,6 @@ monthly_vol <- monthly_vol %>%
   )
 
 ```
-
 
 ```{r Execute Monthly Volume Table, echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -853,7 +839,6 @@ for (i in index_squence) {
 
 ```
 
-
 ```{r Volume Tables (Office), echo = FALSE, warning = FALSE, message = FALSE}
 
 # Volume Tables ----------------------------------------------------------------
@@ -884,7 +869,6 @@ monthly_vol_office <- monthly_vol_office %>%
   )
 
 ```
-
 
 ```{r Execute Monthly Volume Office Table, echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -919,7 +903,6 @@ for (i in index_squence) {
 
 ```
 
-
 ```{r Volume by Zipcode, echo = FALSE, warning = FALSE, message = FALSE}
 
 dept_zip_code_ref_tbl <- tbl(conn1, "DEPT_ZIP_CODE")
@@ -946,7 +929,6 @@ vol_zip_code <- vol_zip_code %>%
 
 ```
 
-
 ```{r Execute Volume by Zipcode Table, echo = FALSE, warning = FALSE, message = FALSE}
 
 # Truncate the table
@@ -968,7 +950,6 @@ for (i in index_squence) {
 }
 
 ```
-
 
 ```{r Volume by Zipcode (Office), echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -993,7 +974,6 @@ vol_zip_code_office <- vol_zip_code_office %>%
 
 ```
 
-
 ```{r Execute Volume by Zipcode office Table, echo = FALSE, warning = FALSE, message = FALSE}
 
 # Truncate the table
@@ -1015,7 +995,6 @@ for (i in index_squence) {
 }
 
 ```
-
 
 ```{r Payor Mix Table, echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -1047,7 +1026,6 @@ payer_mix_ytd <- payer_mix_ytd %>%
 
 ```
 
-
 ```{r Execute Payor Mix Table, echo = FALSE, warning = FALSE, message = FALSE}
 
 payer_mix_ytd_table <- payer_mix_ytd
@@ -1073,37 +1051,35 @@ for (i in index_squence) {
 
 ```
 
-
 ```{r Payor Mix Table (Office), echo = FALSE, warning = FALSE, message = FALSE}
 
-payer_mix_ytd_office <- scheduling_data_raw_tbl %>%
-  filter(APPT_DTTM >= TO_DATE(quarter_start_date,"YYYY-MM-DD HH24:MI:SS") & APPT_DTTM <= TO_DATE(quarter_end_date,"YYYY-MM-DD HH24:MI:SS")) %>%
-  filter(Managed == "Department") %>%
-  filter(Office == "Office") %>%
-  filter(!is.na(Site)) %>%
-  filter(DERIVED_STATUS_DESC == "Arrived") %>%
-  group_by(Campus.Specialty.Group, Campus.Specialty.SubGroup, Site, Appt.Year, Appt.MonNum, FINCLASS) %>%
-  summarise(payer = n()) %>%
-  collect()
-
-payer_mix_ytd_office <- payer_mix_ytd_office %>%
-  mutate(Appt.Month = format(as.Date(paste0(Appt.Year,"-",Appt.MonNum,"-01"), "%Y-%m-%d"), "%b")) %>%
-  mutate(Coverage = case_when(str_detect(FINCLASS, "Commercial/Managed Care") ~ "Commercial/ Managed Care",
-                              str_detect(FINCLASS, "Commercial") ~ "Commercial/ Managed Care",
-                              str_detect(FINCLASS, "WTC") ~ "Commercial/ Managed Care",
-                              str_detect(FINCLASS, "Medicaid Managed Care") ~ "Medicaid Managed Care",
-                              str_detect(FINCLASS, "Medicaid MS") ~ "Medicaid HMO",
-                              str_detect(FINCLASS, "Medicaid HMO") ~ "Medicaid HMO",
-                              str_detect(FINCLASS, "Medicare Managed Care") ~ "Medicare Managed Care",
-                              str_detect(FINCLASS, "Medicare MS") ~ "Medicare HMO",
-                              str_detect(FINCLASS, "Medicare HMO") ~ "Medicare HMO",
-                              str_detect(FINCLASS, "Self") ~ "Self-Pay",
-                              TRUE ~ "Other")) %>%
-  group_by(Campus.Specialty.Group, Campus.Specialty.SubGroup, Site, Appt.Year, Appt.MonNum, Appt.Month, Coverage) %>%
-  summarise(payer = sum(payer))
+# payer_mix_ytd_office <- scheduling_data_raw_tbl %>%
+#   filter(APPT_DTTM >= TO_DATE(quarter_start_date,"YYYY-MM-DD HH24:MI:SS") & APPT_DTTM <= TO_DATE(quarter_end_date,"YYYY-MM-DD HH24:MI:SS")) %>%
+#   filter(Managed == "Department") %>%
+#   filter(Office == "Office") %>%
+#   filter(!is.na(Site)) %>%
+#   filter(DERIVED_STATUS_DESC == "Arrived") %>%
+#   group_by(Campus.Specialty.Group, Campus.Specialty.SubGroup, Site, Appt.Year, Appt.MonNum, FINCLASS) %>%
+#   summarise(payer = n()) %>%
+#   collect()
+# 
+# payer_mix_ytd_office <- payer_mix_ytd_office %>%
+#   mutate(Appt.Month = format(as.Date(paste0(Appt.Year,"-",Appt.MonNum,"-01"), "%Y-%m-%d"), "%b")) %>%
+#   mutate(Coverage = case_when(str_detect(FINCLASS, "Commercial/Managed Care") ~ "Commercial/ Managed Care",
+#                               str_detect(FINCLASS, "Commercial") ~ "Commercial/ Managed Care",
+#                               str_detect(FINCLASS, "WTC") ~ "Commercial/ Managed Care",
+#                               str_detect(FINCLASS, "Medicaid Managed Care") ~ "Medicaid Managed Care",
+#                               str_detect(FINCLASS, "Medicaid MS") ~ "Medicaid HMO",
+#                               str_detect(FINCLASS, "Medicaid HMO") ~ "Medicaid HMO",
+#                               str_detect(FINCLASS, "Medicare Managed Care") ~ "Medicare Managed Care",
+#                               str_detect(FINCLASS, "Medicare MS") ~ "Medicare HMO",
+#                               str_detect(FINCLASS, "Medicare HMO") ~ "Medicare HMO",
+#                               str_detect(FINCLASS, "Self") ~ "Self-Pay",
+#                               TRUE ~ "Other")) %>%
+#   group_by(Campus.Specialty.Group, Campus.Specialty.SubGroup, Site, Appt.Year, Appt.MonNum, Appt.Month, Coverage) %>%
+#   summarise(payer = sum(payer))
 
 ```
-
 
 ```{r Open Encounters Metric Trending by Site 3, fig.width=12, fig.height = 5, fig.align = 'center', echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -1153,18 +1129,16 @@ missing_chg_data <- missing_chg_data %>%
 
 ```
 
-
 ```{r}
 
-site_encounters <- missing_chg_data %>%
-  filter(Appt.Year == 2023) %>%
-  group_by(SITE, Managed, Campus.Specialty.Group, Campus.Specialty.SubGroup, group) %>%
-  summarise(total = n()) %>%
-  group_by(SITE, Managed, Campus.Specialty.Group, Campus.Specialty.SubGroup) %>%
-  mutate(perc = round(total/sum(total),2))
+# site_encounters <- missing_chg_data %>%
+#   filter(Appt.Year == 2023) %>%
+#   group_by(SITE, Managed, Campus.Specialty.Group, Campus.Specialty.SubGroup, group) %>%
+#   summarise(total = n()) %>%
+#   group_by(SITE, Managed, Campus.Specialty.Group, Campus.Specialty.SubGroup) %>%
+#   mutate(perc = round(total/sum(total),2))
 
 ```
-
 
 ```{r Execute Open Encounters Table, echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -1187,7 +1161,6 @@ for (i in index_squence) {
 }
 
 ```
-
 
 ```{r Referrals Data Importing, echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -1259,7 +1232,6 @@ referrals_merged <- referrals_merged %>%
 
 ```
 
-
 ```{r Referrals Data Processing, echo = FALSE, warning = FALSE, message = FALSE}
 
 # Referrals Raw Data Processing ------------------------------------------------
@@ -1280,7 +1252,6 @@ referrals_merged <- referrals_merged %>%
                                    ,TRUE ~ "Not Specified"))
 
 ```
-
 
 ```{r Unique Referral Volume Data, echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -1340,7 +1311,6 @@ referral_vol <- referral_vol %>%
 # referral_vol <- readRDS("referral_vol.rds")
 ```
 
-
 ```{r Import Processed Referrals Data, echo = FALSE, warning = FALSE, message = FALSE}
 
 # referrals <- readRDS("/nfs/data/Applications/Ambulatory/Data_Updated/referral_vol.rds")
@@ -1356,8 +1326,6 @@ sessional_prov_mapping <- sessional_prov_mapping_tbl %>% collect()
 referrals$Managed <-  master_amb_mapping$Managed[match(referrals$ReceivedByDepID, master_amb_mapping$DepartmentId)]
 referrals$Site <- master_amb_mapping$Site[match(referrals$ReceivedByDepID, master_amb_mapping$DepartmentId)]
 referrals$Office <- master_amb_mapping$`Office/Procedure`[match(referrals$ReceivedByDepID, master_amb_mapping$DepartmentId)] # Office visit department?
-
-# ## Manual Mapping of Specialty and Site
 referrals$Campus.Specialty.Group <- master_amb_mapping$Campus.Specialty.Group[match(referrals$ReceivedByDepID, 
                                                                 master_amb_mapping$DepartmentId)]
 referrals$Campus.Specialty.SubGroup <- master_amb_mapping$Campus.Specialty.SubGroup[match(referrals$ReceivedByDepID, 
@@ -1375,13 +1343,12 @@ referrals <- referrals %>%
          Office = ifelse(is.na(`Sessional Office`), Office, `Sessional Office`)) 
 
 
-referrals <- referrals %>%
-  mutate(Campus.Specialty.Group = case_when(ReceivedByDept == "787 11TH AVE MSW SPINE CENTER" & ReceivedByProvider %in% ortho_providers ~ "Orthopedics",
-                                            TRUE ~ Campus.Specialty.Group))
+# referrals <- referrals %>%
+#   mutate(Campus.Specialty.Group = case_when(ReceivedByDept == "787 11TH AVE MSW SPINE CENTER" & ReceivedByProvider %in% ortho_providers ~ "Orthopedics",
+#                                             TRUE ~ Campus.Specialty.Group))
 
 invisible(gc())
 ```
-
 
 ```{r Conversion Rate, echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -1404,24 +1371,45 @@ monthly_referral_vol <- referrals %>%
 ```
 
 
+```{r}
+
+# neurosurg <- referrals %>%
+#   filter(Managed == "Department") %>%
+#   filter(createdYear == 2023) %>%
+#   mutate(ReceivedBySite = ifelse(is.na(ReceivedBySite), "OTHER", ReceivedBySite)) %>%
+#   filter(Campus.Specialty.Group == "Neurosurgery")
+# 
+# require(openxlsx)
+# write.xlsx(neurosurg, "Neurosurgery Referrals_2023.xlsx")
+# 
+# 
+# 
+# check <- neurosurg %>%
+#   group_by(ReceivedByDept, ProcedureName) %>%
+#   summarise(total = n())
+
+
+```
+
+
 ```{r Execute Monthly Referrals Table, echo = FALSE, warning = FALSE, message = FALSE}
 
-# Truncate the table
-dbExecute(conn1, "TRUNCATE TABLE QPR_MMONTHLY_REFERRALS")
-
-## Write to Oracle 
-batch_size <- 1000
- 
-index_squence <- seq(1, nrow(monthly_referral_vol), by = batch_size)
-for (i in index_squence) {
-  if(i == max(index_squence)) {
-    batch <- monthly_referral_vol[i:nrow(monthly_referral_vol), ]
-  } else {
-    batch <- monthly_referral_vol[i:(i + batch_size - 1), ]
-  }
-  dbWriteTable(conn = conn1, name = "QPR_MONTHLY_REFERRALS", value = batch, row.names = FALSE, append = TRUE)
-  print(paste0("i is:", i))
-  print(batch)
-}
+# # Truncate the table
+# dbExecute(conn1, "TRUNCATE TABLE QPR_MONTHLY_REFERRALS")
+# 
+# ## Write to Oracle 
+# batch_size <- 1000
+#  
+# index_squence <- seq(1, nrow(monthly_referral_vol), by = batch_size)
+# for (i in index_squence) {
+#   if(i == max(index_squence)) {
+#     batch <- monthly_referral_vol[i:nrow(monthly_referral_vol), ]
+#   } else {
+#     batch <- monthly_referral_vol[i:(i + batch_size - 1), ]
+#   }
+#   dbWriteTable(conn = conn1, name = "QPR_MONTHLY_REFERRALS", value = batch, row.names = FALSE, append = TRUE)
+#   print(paste0("i is:", i))
+#   print(batch)
+# }
 
 ```

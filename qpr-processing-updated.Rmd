@@ -496,30 +496,43 @@ scheduling_data_raw_tbl <- scheduling_data_raw_tbl %>%
 
 ```
 
+```{r}
+
+# neurosurg_scheduling <- scheduling_data_raw_tbl %>%
+#   filter(Managed == "Department") %>%
+#   filter(Campus.Specialty.Group == "Neurosurgery") %>%
+#   filter(Appt.Made.Year >= 2022) %>%
+#   collect()
+#   
+# require(openxlsx)
+# write.xlsx(neurosurg_scheduling, "Neurosurgery Appts Scheduled_03.15.24.xlsx")
+
+```
+
 ```{r Manual Import Wait Time Data, echo = FALSE, warning = FALSE, message = FALSE}
 
-waitTime_dist_specialty_ytd <- readRDS("waitTime_dist_specialty_ytd.rds")
-waitTime_dist_site_ytd <- readRDS("waitTime_dist_site_ytd.rds")
-waitTime_mshs_ytd <- readRDS("waitTime_mshs_ytd.rds") 
-waitTime_site_ytd <- readRDS("waitTime_site_ytd.rds") 
-waitTime_prov_ytd <- readRDS("waitTime_prov_ytd.rds") 
-waitTime_dist_specialty_group_ytd <- readRDS("waitTime_dist_specialty_group_ytd.rds") 
-waitTime_dist_site_group_ytd <- readRDS("waitTime_dist_site_group_ytd.rds") 
-waitTime_mshs_group_ytd <- readRDS("waitTime_mshs_group_ytd.rds") 
-waitTime_site_group_ytd <- readRDS("waitTime_site_group_ytd.rds") 
-waitTime_prov_group_ytd <- readRDS("waitTime_prov_group_ytd.rds") 
-
-
-waitTime_dist_specialty_office_ytd <- readRDS("waitTime_dist_specialty_office_ytd.rds")
-waitTime_dist_site_office_ytd <- readRDS("waitTime_dist_site_office_ytd.rds")
-waitTime_mshs_office_ytd <- readRDS("waitTime_mshs_office_ytd.rds")
-waitTime_site_office_ytd <- readRDS("waitTime_site_office_ytd.rds")
-waitTime_prov_office_ytd <- readRDS("waitTime_prov_office_ytd.rds")
-waitTime_dist_specialty_group_office_ytd <- readRDS("waitTime_dist_specialty_group_office_ytd.rds")
-waitTime_dist_site_group_office_ytd <- readRDS("waitTime_dist_site_group_office_ytd.rds")
-waitTime_mshs_group_office_ytd <- readRDS("waitTime_mshs_group_office_ytd.rds")
-waitTime_site_group_office_ytd <- readRDS("waitTime_site_group_office_ytd.rds")
-waitTime_prov_group_office_ytd <- readRDS("waitTime_prov_group_office_ytd.rds")
+# waitTime_dist_specialty_ytd <- readRDS("waitTime_dist_specialty_ytd.rds")
+# waitTime_dist_site_ytd <- readRDS("waitTime_dist_site_ytd.rds")
+# waitTime_mshs_ytd <- readRDS("waitTime_mshs_ytd.rds") 
+# waitTime_site_ytd <- readRDS("waitTime_site_ytd.rds") 
+# waitTime_prov_ytd <- readRDS("waitTime_prov_ytd.rds") 
+# waitTime_dist_specialty_group_ytd <- readRDS("waitTime_dist_specialty_group_ytd.rds") 
+# waitTime_dist_site_group_ytd <- readRDS("waitTime_dist_site_group_ytd.rds") 
+# waitTime_mshs_group_ytd <- readRDS("waitTime_mshs_group_ytd.rds") 
+# waitTime_site_group_ytd <- readRDS("waitTime_site_group_ytd.rds") 
+# waitTime_prov_group_ytd <- readRDS("waitTime_prov_group_ytd.rds") 
+# 
+# 
+# waitTime_dist_specialty_office_ytd <- readRDS("waitTime_dist_specialty_office_ytd.rds")
+# waitTime_dist_site_office_ytd <- readRDS("waitTime_dist_site_office_ytd.rds")
+# waitTime_mshs_office_ytd <- readRDS("waitTime_mshs_office_ytd.rds")
+# waitTime_site_office_ytd <- readRDS("waitTime_site_office_ytd.rds")
+# waitTime_prov_office_ytd <- readRDS("waitTime_prov_office_ytd.rds")
+# waitTime_dist_specialty_group_office_ytd <- readRDS("waitTime_dist_specialty_group_office_ytd.rds")
+# waitTime_dist_site_group_office_ytd <- readRDS("waitTime_dist_site_group_office_ytd.rds")
+# waitTime_mshs_group_office_ytd <- readRDS("waitTime_mshs_group_office_ytd.rds")
+# waitTime_site_group_office_ytd <- readRDS("waitTime_site_group_office_ytd.rds")
+# waitTime_prov_group_office_ytd <- readRDS("waitTime_prov_group_office_ytd.rds")
 
 ```
 
@@ -776,6 +789,37 @@ for (i in index_squence) {
 }
 
 ```
+
+
+```{r}
+
+medicine_2022 <- scheduling_data_raw_tbl %>%
+  filter(Appt.Year == 2022) %>%
+  filter(APPT_DTTM >= TO_DATE(quarter_start_date,"YYYY-MM-DD HH24:MI:SS") & APPT_DTTM <= TO_DATE(quarter_end_date,"YYYY-MM-DD HH24:MI:SS")) %>%
+  filter(Managed == "Department") %>%
+  filter(!is.na(Site)) %>%
+  filter(DERIVED_STATUS_DESC == "Arrived") %>%
+  filter(Campus.Specialty.Group == "Medicine") %>%
+  collect()
+
+medicine_2023 <- scheduling_data_raw_tbl %>%
+  filter(Appt.Year == 2023) %>%
+  filter(APPT_DTTM >= TO_DATE(quarter_start_date,"YYYY-MM-DD HH24:MI:SS") & APPT_DTTM <= TO_DATE(quarter_end_date,"YYYY-MM-DD HH24:MI:SS")) %>%
+  filter(Managed == "Department") %>%
+  filter(!is.na(Site)) %>%
+  filter(DERIVED_STATUS_DESC == "Arrived") %>%
+  filter(Campus.Specialty.Group == "Medicine") %>%
+  collect()
+
+require(openxlsx)
+write.xlsx(medicine_2022, "Medicine Arrived Data_2022.xlsx")
+write.xlsx(medicine_2023, "Medicine Arrived Data_2023.xlsx")
+
+write.csv(medicine_2022, "Medicine Arrived Data_2022.csv")
+write.csv(medicine_2023, "Medicine Arrived Data_2023.csv")
+
+```
+
 
 ```{r Volume Tables (All), echo = FALSE, warning = FALSE, message = FALSE}
 

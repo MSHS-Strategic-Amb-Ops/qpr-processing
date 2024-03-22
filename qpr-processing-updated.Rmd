@@ -793,30 +793,30 @@ for (i in index_squence) {
 
 ```{r}
 
-medicine_2022 <- scheduling_data_raw_tbl %>%
-  filter(Appt.Year == 2022) %>%
-  filter(APPT_DTTM >= TO_DATE(quarter_start_date,"YYYY-MM-DD HH24:MI:SS") & APPT_DTTM <= TO_DATE(quarter_end_date,"YYYY-MM-DD HH24:MI:SS")) %>%
-  filter(Managed == "Department") %>%
-  filter(!is.na(Site)) %>%
-  filter(DERIVED_STATUS_DESC == "Arrived") %>%
-  filter(Campus.Specialty.Group == "Medicine") %>%
-  collect()
-
-medicine_2023 <- scheduling_data_raw_tbl %>%
-  filter(Appt.Year == 2023) %>%
-  filter(APPT_DTTM >= TO_DATE(quarter_start_date,"YYYY-MM-DD HH24:MI:SS") & APPT_DTTM <= TO_DATE(quarter_end_date,"YYYY-MM-DD HH24:MI:SS")) %>%
-  filter(Managed == "Department") %>%
-  filter(!is.na(Site)) %>%
-  filter(DERIVED_STATUS_DESC == "Arrived") %>%
-  filter(Campus.Specialty.Group == "Medicine") %>%
-  collect()
-
-require(openxlsx)
-write.xlsx(medicine_2022, "Medicine Arrived Data_2022.xlsx")
-write.xlsx(medicine_2023, "Medicine Arrived Data_2023.xlsx")
-
-write.csv(medicine_2022, "Medicine Arrived Data_2022.csv")
-write.csv(medicine_2023, "Medicine Arrived Data_2023.csv")
+# medicine_2022 <- scheduling_data_raw_tbl %>%
+#   filter(Appt.Year == 2022) %>%
+#   filter(APPT_DTTM >= TO_DATE(quarter_start_date,"YYYY-MM-DD HH24:MI:SS") & APPT_DTTM <= TO_DATE(quarter_end_date,"YYYY-MM-DD HH24:MI:SS")) %>%
+#   filter(Managed == "Department") %>%
+#   filter(!is.na(Site)) %>%
+#   filter(DERIVED_STATUS_DESC == "Arrived") %>%
+#   filter(Campus.Specialty.Group == "Medicine") %>%
+#   collect()
+# 
+# medicine_2023 <- scheduling_data_raw_tbl %>%
+#   filter(Appt.Year == 2023) %>%
+#   filter(APPT_DTTM >= TO_DATE(quarter_start_date,"YYYY-MM-DD HH24:MI:SS") & APPT_DTTM <= TO_DATE(quarter_end_date,"YYYY-MM-DD HH24:MI:SS")) %>%
+#   filter(Managed == "Department") %>%
+#   filter(!is.na(Site)) %>%
+#   filter(DERIVED_STATUS_DESC == "Arrived") %>%
+#   filter(Campus.Specialty.Group == "Medicine") %>%
+#   collect()
+# 
+# require(openxlsx)
+# write.xlsx(medicine_2022, "Medicine Arrived Data_2022.xlsx")
+# write.xlsx(medicine_2023, "Medicine Arrived Data_2023.xlsx")
+# 
+# write.csv(medicine_2022, "Medicine Arrived Data_2022.csv")
+# write.csv(medicine_2023, "Medicine Arrived Data_2023.csv")
 
 ```
 
